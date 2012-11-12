@@ -413,6 +413,9 @@
             P%MassiveNuMethod = Nu_best
             P%OnlyTransfers = .false.
 
+            ! oct12
+            P%DerivedParameters = .true.
+
          end subroutine CAMB_SetDefParams
 
 
