@@ -68,10 +68,10 @@ FFLAGS =  -O3 -fopenmp -ffast-math -march=native -funroll-loops
 
 #Settings for building camb_fits
 #Location of FITSIO and name of library
-FITSDIR       = /usr/lib/x86_64-linux-gnu
-FITSLIB       = cfitsio
+#FITSDIR       = /usr/lib/x86_64-linux-gnu
+#FITSLIB       = cfitsio
 #Location of HEALPIX for building camb_fits
-HEALPIXDIR    = /home/cpac/cpac-tools/healpix
+#HEALPIXDIR    = /home/cpac/cpac-tools/healpix
 
 ifneq ($(FISHER),)
 FFLAGS += -DFISHER
