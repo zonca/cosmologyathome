@@ -140,7 +140,10 @@
                 
 !  Read initial parameters.
        
-       w_lam = Ini_Read_Double('w', -1.d0)   
+       !w_lam = Ini_Read_Double('w', -1.d0)   
+       ! oct12 version
+       call DarkEnergy_ReadParams(DefIni)
+
        cs2_lam = Ini_Read_Double('cs2_lam',1.d0)
 
        P%h0     = Ini_Read_Double('hubble')
@@ -262,6 +265,9 @@
               read (numstr,*) P%InitialConditionVector(1:initial_iso_neutrino_vel)
             end if
 
+            ! oct12
+            if (P%Scalar_initial_condition/= initial_adiabatic) use_spline_template = .false.
+
         end if
         
        if (P%WantScalars) then
@@ -350,6 +356,8 @@
        P%AccuratePolarization = Ini_Read_Logical('accurate_polarization',.true.)
        P%AccurateReionization = Ini_Read_Logical('accurate_reionization',.false.)
        P%AccurateBB = Ini_Read_Logical('accurate_BB',.false.)
+       ! oct12
+       P%DerivedParameters = Ini_Read_Logical('derived_parameters',.true.)
  
        version_check = Ini_Read_String('version_check')
        if (version_check == '') then
