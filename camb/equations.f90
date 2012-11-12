@@ -25,6 +25,16 @@
           !(otherwise assumed constant, though this is almost certainly unrealistic)
 
          logical :: w_perturb = .true.
+       contains
+
+        subroutine DarkEnergy_ReadParams(Ini)
+        use IniFile
+        Type(TIniFile) :: Ini
+
+           w_lam = Ini_Read_Double_File(Ini,'w', -1.d0)
+           cs2_lam = Ini_Read_Double_File(Ini,'cs2_lam',1.d0)
+
+        end subroutine DarkEnergy_ReadParams
 
        end module LambdaGeneral
 
@@ -181,8 +191,8 @@
 
             integer E_ix, B_ix !tensor polarization indices
             real(dl) denlkt(4,max_l_evolve),Kft(max_l_evolve) 
-              
-               
+
+
         end type EvolutionVars
 
 !precalculated arrays
@@ -1268,7 +1278,7 @@
              pigdot=0
              octg=0
              octgprime=0
-             qgdot = -4*dz/k
+             qgdot = -4*dz/3
         else
             if (EV%TightCoupling) then
              pig = EV%pig
@@ -2091,7 +2101,6 @@
        
 !  8*pi*a*a*SUM[(rho_i+p_i)*v_i]
         dgq=dgq + grhog_t*qg+grhor_t*qr
-
 
 !  Photon mass density over baryon mass density
         photbar=grhog_t/grhob_t
