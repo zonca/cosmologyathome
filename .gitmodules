@@ -1,0 +1,3 @@
+[submodule "apps/camb"]
+	path = apps/camb
+	url = https://github.com/marius311/cosmologyathome_camb_apps
