@@ -1,0 +1,12 @@
+* Update of from camb Jan12 to Oct12
+
+- Makefile_main, Oct12 adds cosmorec, but we do not plan to use it
+- Makefile no significant differences
+- camb.f90, just 1 line difference between jan12 and oct12
+- cmbmain.f90, added boinc checkpointing to the Oct12 version
+- inifiledriver.F90, applied 3 lines difference from Jan12 to Oct12 to the
+boincified version
+- inifile.f90 just got Oct12 version and added boinc func at the bottom
+- lensing.f90 had no change from Jan to Oct, so kept boincified version
+- utils, subroutines, recfast, readme, params, modules, halofit, equation
+and constants not affected by boincification, then just got Oct version
