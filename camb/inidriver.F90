@@ -278,8 +278,8 @@
           ! LensPotentialFileName =  Ini_Read_String('lens_potential_output_file')
 
           ! -- Boinc addition
-          !ScalarFileName = ReadBoincFilename('scalar_output_file', outroot) 
-          call boincrf('scalar_output_file', ScalarFileName, len('scalar_output_file'), Ini_max_string_len)
+          ScalarFileName = ReadBoincFilename('scalar_output_file', outroot) 
+          !call boincrf('scalar_output_file', ScalarFileName, len('scalar_output_file'), Ini_max_string_len)
           LensedFileName = ReadBoincFilename('lensed_output_file', outroot) 
           LensPotentialFileName = ReadBoincFilename('lens_potential_output_file', "") 
           
@@ -492,7 +492,6 @@
              !! The transfer function and matter power spectrum are written using
              !! the routines in CAMB above.
           if (P%WantScalars) then
-             write (0, *) ScalarFileName
              open(unit=1,file=ScalarFileName)
              if (P%DoLensing) then
                 do i = 1, lvals_scalar%l0
