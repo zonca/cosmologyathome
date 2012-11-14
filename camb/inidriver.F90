@@ -15,12 +15,6 @@
 #ifdef NAGF95 
         use F90_UNIX
 #endif
-
-        !---- Boinc Addition
-        !! This is added to get the evolved l-values.
-        use lvalues, only : lSamp, lSamples, initlval
-        !---- End Boinc
-
         implicit none
 
         ! -- Boinc Addition
@@ -37,12 +31,6 @@
         character(LEN=Ini_max_string_len) numstr, VectorFileName, &
             InputFile, ScalarFileName, TensorFileName, TotalFileName, LensedFileName,&
             LensedTotFileName, LensPotentialFileName
-                    
-        ! -- Boinc Addition
-        character(LEN=Ini_max_string_len) BoincInputFile, CPsFileName
-        integer strlen
-        ! -- End Boinc
-        
         integer i
         character(LEN=Ini_max_string_len) TransferFileNames(max_transfer_redshifts), &
                MatterPowerFileNames(max_transfer_redshifts), outroot, version_check
@@ -54,35 +42,9 @@
 
         logical bad
 
-        ! -- Boinc - InputFile = GetParam(1)
-        ! -- Boinc - if (InputFile == '') stop 'No parameter input file'
+        InputFile = GetParam(1)
+        if (InputFile == '') stop 'No parameter input file'
 
-       ! -- Boinc Addition
-       !! This will hold the values that were evolved
-       type(lSamples) :: lvals_scalar, lvals_tensor
-       integer :: ll, ltmp
-       real(dl) :: theta
-
-       call boinc_init()
-       if (boinc_is_standalone() /= 0) then
-         write(*,*) "Running standalone"
-       else
-         call boinc_fraction_done(0.0)
-       end if
-
-        InputFile = ''
-        BoincInputFile = ''
- 
-        BoincInputFile = 'in'
-        write (*,*) "inputfile: ", BoincInputFile
-        if (BoincInputFile == '') stop 'No parameter input file'
-
-        strlen = len(BoincInputFile)
-
-        call boincrf(BoincInputFile, InputFile, strlen, Ini_max_string_len)
-        if (InputFile == '') stop 'boincrf failed'
-        ! -- End Boinc
-        
         call Ini_Open(InputFile, 1, bad, .false.)
         if (bad) stop 'Error opening parameter file'
 
@@ -143,8 +105,6 @@
        !w_lam = Ini_Read_Double('w', -1.d0)   
        ! oct12 version
        call DarkEnergy_ReadParams(DefIni)
-
-       cs2_lam = Ini_Read_Double('cs2_lam',1.d0)
 
        P%h0     = Ini_Read_Double('hubble')
  
@@ -212,30 +172,14 @@
              
              if (TransferFileNames(i) == '') then
                  TransferFileNames(i) =  trim(numcat('transfer_',i))//'.dat'
-                 
-                 ! -- Boinc Addition
-                 open(unit=1,file=TransferFilenames(i))
-                 close(1) 
-                 ! -- End Boinc
-                 
              end if
              if (MatterPowerFilenames(i) == '') then
                  MatterPowerFilenames(i) =  trim(numcat('matterpower_',i))//'.dat'
-
-                ! -- Boinc Addition
-                 open(unit=1,file=MatterPowerFilenames(i))
-                 close(1)                 
-                ! -- End Boinc  
-                
              end if
              if (TransferFileNames(i)/= '') &
-                   ! -- Boinc - TransferFileNames(i) = trim(outroot)//TransferFileNames(i)
-                   TransferFileNames(i) = ReadBoincFilename('transfer_filename('//trim(numstr)//')', outroot) ! Boinc addition
-
+                   TransferFileNames(i) = trim(outroot)//TransferFileNames(i)
              if (MatterPowerFilenames(i) /= '') &
-                 ! -- Boinc - MatterPowerFilenames(i)=trim(outroot)//MatterPowerFilenames(i)
-                 MatterPowerFilenames(i) = ReadBoincFilename('transfer_matterpower('//trim(numstr)//')', outroot) ! Boinc addition
-
+                 MatterPowerFilenames(i)=trim(outroot)//MatterPowerFilenames(i)
         end do
 
 
@@ -264,51 +208,31 @@
               numstr = Ini_Read_String('initial_vector',.true.)
               read (numstr,*) P%InitialConditionVector(1:initial_iso_neutrino_vel)
             end if
-
             ! oct12
             if (P%Scalar_initial_condition/= initial_adiabatic) use_spline_template = .false.
-
         end if
         
        if (P%WantScalars) then
-          
-          ! -- Boinc Remove
-          ! ScalarFileName = trim(outroot)//Ini_Read_String('scalar_output_file')
-          ! LensedFileName =  trim(outroot) //Ini_Read_String('lensed_output_file')
-          ! LensPotentialFileName =  Ini_Read_String('lens_potential_output_file')
-
-          ! -- Boinc addition
-          ScalarFileName = ReadBoincFilename('scalar_output_file', outroot) 
-          !call boincrf('scalar_output_file', ScalarFileName, len('scalar_output_file'), Ini_max_string_len)
-          LensedFileName = ReadBoincFilename('lensed_output_file', outroot) 
-          LensPotentialFileName = ReadBoincFilename('lens_potential_output_file', "") 
-          
+          ScalarFileName = trim(outroot)//Ini_Read_String('scalar_output_file')
+          LensedFileName =  trim(outroot) //Ini_Read_String('lensed_output_file')
+          LensPotentialFileName =  Ini_Read_String('lens_potential_output_file')
           if (LensPotentialFileName/='') LensPotentialFileName = concat(outroot,LensPotentialFileName)
         end if
         if (P%WantTensors) then
-          ! TensorFileName =  trim(outroot) //Ini_Read_String('tensor_output_file')
-          TensorFileName = ReadBoincFilename('tensor_output_file', outroot) !  Boinc Addition
-
+          TensorFileName =  trim(outroot) //Ini_Read_String('tensor_output_file')
          if (P%WantScalars)  then
-          ! TotalFileName =  trim(outroot) //Ini_Read_String('total_output_file')
-          ! LensedTotFileName = Ini_Read_String('lensed_total_output_file')
-          TotalFileName = ReadBoincFilename('total_output_file', outroot) ! Boinc addition
-          LensedTotFileName = ReadBoincFilename('lensed_total_output_file', "") ! Boinc addition
+          TotalFileName =  trim(outroot) //Ini_Read_String('total_output_file')
+          LensedTotFileName = Ini_Read_String('lensed_total_output_file')
           if (LensedTotFileName/='') LensedTotFileName= trim(outroot) //trim(LensedTotFileName)
          end if
         end if
         if (P%WantVectors) then
-          ! VectorFileName =  trim(outroot) //Ini_Read_String('vector_output_file')
-          VectorFileName = ReadBoincFilename('vector_output_file', outroot) ! Boinc addition
-          open(unit=1,file=VectorFileName)
-          close(1)
+          VectorFileName =  trim(outroot) //Ini_Read_String('vector_output_file')
         end if
          
 #ifdef WRITE_FITS
         if (P%WantCls) then
-        ! FITSfilename =  trim(outroot) //Ini_Read_String('FITS_filename',.true.)
-        FITSfilename = ReadBoincFilename('FITS_filename', outroot) ! Boinc addition
-
+        FITSfilename =  trim(outroot) //Ini_Read_String('FITS_filename',.true.)
         if (FITSfilename /='') then
         inquire(file=FITSfilename, exist=bad)
         if (bad) then
@@ -320,34 +244,13 @@
 #endif        
        
        !-- Boinc Addition
-       !! Touch each file to make sure they are empty
-       !CPsFileName = trim(outroot)//Ini_Read_String('cps_output_file')
-       !CPsFileName = ReadBoincFilename('cps_output_file', outroot)
-       !open(unit=1,file=CpsFileName)
-       !close(1)
-       if (P%WantScalars) then
-          open(unit=1,file=ScalarFileName)
-          close(1)
-       end if
-       if (P%WantTensors) then
-          open(unit=1,file=TensorFileName)
-          close(1)
-       end if
-       if (P%WantVectors) then
-          stop 'No Vectors with Boinc'
-          open(unit=1,file=VectorFileName)
-          close(1)
-       end if
-       if (P%DoLensing) then
-          open(unit=1,file=LensedFileName)
-          close(1)
-       end if
-       if (P%WantTransfer) then
-          open(unit=1,file=TransferFilenames(1))
-          close(1)
-          open(unit=1,file=MatterPowerFilenames(1))
-          close(1)
-       end if
+       !! Touch each output file to make sure they are created
+       open(unit=1,file=ScalarFileName);close(1)
+       open(unit=1,file=TensorFileName);close(1)
+       open(unit=1,file=VectorFileName);close(1)
+       open(unit=1,file=LensedFileName);close(1)
+       open(unit=1,file=TransferFilenames(1));close(1)
+       open(unit=1,file=MatterPowerFilenames(1));close(1)
        !-- End Boinc
 
        Ini_fail_on_not_found = .false. 
@@ -359,7 +262,7 @@
        P%AccurateBB = Ini_Read_Logical('accurate_BB',.false.)
        ! oct12
        P%DerivedParameters = Ini_Read_Logical('derived_parameters',.true.)
- 
+
        version_check = Ini_Read_String('version_check')
        if (version_check == '') then
           !tag the output used parameters .ini file with the version of CAMB being used now
@@ -403,10 +306,7 @@
 
        call Ini_Close
 
-       ! -- Boinc Addition
-       !! Dont worry about validating with boinc, since we control inputs
-       ! if (.not. CAMB_ValidateParams(P)) stop 'Stopped due to parameter error'
-       ! -- End Boinc
+       if (.not. CAMB_ValidateParams(P)) stop 'Stopped due to parameter error'
 
 #ifdef RUNIDLE
        call SetIdle
@@ -417,13 +317,7 @@
          write (*,'("Age of universe/GYr  = ",f7.3)') Age  
        end if 
 
-       if (global_error_flag==0) then
-         call CAMB_GetResults(P)
-         ! -- Boinc Addition
-         !! Store theta so we can record it to the file
-         theta = CosmomcTheta()
-         ! -- End Boinc
-       end if
+       if (global_error_flag==0) call CAMB_GetResults(P)
        if (global_error_flag/=0) then
         write (*,*) 'Error result '//trim(global_error_message)
         stop
@@ -443,103 +337,15 @@
            
           end if
 
-         ! -- Boinc Addition
-         !call output_cl_files(ScalarFileName, TensorFileName, TotalFileName, &
-         !     LensedFileName, LensedTotFilename, output_factor)
-         !     
-         !call output_lens_pot_files(LensPotentialFileName, output_factor)
+         call output_cl_files(ScalarFileName, TensorFileName, TotalFileName, &
+              LensedFileName, LensedTotFilename, output_factor)
+              
+         call output_lens_pot_files(LensPotentialFileName, output_factor)
 
-         !if (P%WantVectors) then
-         !  call output_veccl_files(VectorFileName, output_factor)
-         !end if
+         if (P%WantVectors) then
+           call output_veccl_files(VectorFileName, output_factor)
+         end if
 
-            !! Get lvalues for scalars and tensors to write to files
-          call initlval(lvals_scalar,P%Max_l)
-          call initlval(lvals_tensor,P%Max_l_tensor)
- 
-            !! Write string of Cosmo parameters
-          !open(unit=1,file=CPsFileName)
-          !write(1,'(20E16.7)') P%omegab, &
-          !                     P%omegac, &
-          !                     P%omegav, &
-          !                     P%omegan, &
-          !                     P%omegak, &
-          !                     P%H0,     &
-          !                     theta,    &
-          !                     P%Reion%optical_depth, &
-          !                     P%InitPower%an(1),     &
-          !                     P%InitPower%n_run(1),  &
-          !                     P%InitPower%ScalarPowerAmp(1), &
-          !                     P%InitPower%ant(1),            &
-          !                     P%InitPower%rat(1),            &
-          !                     w_lam,   &
-          !                     cs2_lam, &
-          !                     P%TCMB,  &
-          !                     P%yhe,   &
-          !                     P%Num_Nu_massless, &
-          !                     DBLE(P%Num_Nu_massive)
-                               
-          !write(1,'(20e16.7)') P%omegab, P%omegac, P%omegav, P%omegan, P%omegak,    &
-          !                     P%H0, P%Reion%optical_depth, P%InitPower%an(1),      &
-          !                     P%InitPower%n_run(1), P%InitPower%ScalarPowerAmp(1), &
-          !                     P%InitPower%ant(1), P%InitPower%rat(1), w_lam,       &
-          !                     cs2_lam, P%TCMB, P%yhe, P%Num_Nu_massless,           &
-          !                     P%Num_Nu_massive, w_lamprime, theta
-                               
-          close(1)
-
-             !! Write Cls to file only at lvalues we computed
-             !! The transfer function and matter power spectrum are written using
-             !! the routines in CAMB above.
-          if (P%WantScalars) then
-             open(unit=1,file=ScalarFileName)
-             if (P%DoLensing) then
-                do i = 1, lvals_scalar%l0
-                   ll = lvals_scalar%l(i)
-                   write(1,'(1I5,5E16.7)') ll, output_factor*Cl_scalar(ll,1,1:5)
-                end do
-             else
-                do i = 1, lvals_scalar%l0
-                   ll = lvals_scalar%l(i)
-                   write(1,'(1I5,3E16.7)') ll, output_factor*Cl_scalar(ll,1,1:3)
-                end do
-                close(1)
-             end if
-          end if
- 
-          if (P%WantVectors) then
-             open(unit=1,file=VectorFileName)
-             do i = 1, lvals_scalar%l0
-                ll = lvals_scalar%l(i)
-                write(1,'(1I5,4E16.7)') ll, output_factor*Cl_vector(ll,1,1:4)
-             end do
-             close(1)
-          end if
-
-          if (P%WantTensors) then
-             open(unit=1,file=TensorFileName)
-             do i = 1, lvals_tensor%l0
-                ll = lvals_tensor%l(i)
-                write(1,'(1I5,4E16.7)') ll, output_factor*Cl_tensor(ll,1,1:4)
-             end do
-             close(1)
-          end if
- 
-          if (P%DoLensing) then
-             ltmp = lvals_scalar%l0-1
-             do while (lvals_scalar%l(ltmp) > P%Max_l - 250)
-                ltmp = ltmp - 1
-             end do
-
-             open(unit=1,file=LensedFileName)
-             do i = 1, ltmp
-                ll = lvals_scalar%l(i)
-                write(1,'(1I5,4E16.7)') ll, output_factor*Cl_lensed(ll,1,1:4)
-             end do
-             close(1)
-          end if
-          ! -- End Boinc
- 
 
 #ifdef WRITE_FITS
          if (FITSfilename /= '') call WriteFitsCls(FITSfilename, CP%Max_l)
