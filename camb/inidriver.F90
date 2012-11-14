@@ -22,6 +22,15 @@
         !---- End Boinc
 
         implicit none
+
+        ! -- Boinc Addition
+        interface
+          function boinc_is_standalone()
+            !DEC$ ATTRIBUTES C :: boinc_is_standalone
+            integer boinc_is_standalone
+          end function boinc_is_standalone
+        end interface
+        ! -- End Boinc
         
         Type(CAMBparams) P
         
@@ -51,12 +60,11 @@
        ! -- Boinc Addition
        !! This will hold the values that were evolved
        type(lSamples) :: lvals_scalar, lvals_tensor
-       integer :: ll, ltmp, is_standalone
+       integer :: ll, ltmp
        real(dl) :: theta
 
        call boinc_init()
-       call boinc_is_standalone(is_standalone)
-       if (is_standalone /= 0) then
+       if (boinc_is_standalone() /= 0) then
          write(*,*) "Running standalone"
        else
          call boinc_fraction_done(0.0)

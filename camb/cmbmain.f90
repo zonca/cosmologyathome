@@ -71,6 +71,14 @@
 
       implicit none
 
+      ! -- BOINC Addition
+      interface
+        function boinc_is_standalone()
+          !DEC$ ATTRIBUTES C :: boinc_is_standalone
+          integer boinc_is_standalone
+        end function boinc_is_standalone
+      end interface
+
       interface
         function boinc_time_to_checkpoint()
           !DEC$ ATTRIBUTES C :: boinc_time_to_checkpoint
@@ -301,7 +309,7 @@ contains
       print'(a,i3,a)', ' >> Finished ', perc_resume, '%'
       
       diff = upper - lower
-      call boinc_is_standalone(is_standalone)
+      is_standalone = boinc_is_standalone()
       q_ix_max = REAL(ThisCT%q%npoints)
       ! -- End BOINC
       
