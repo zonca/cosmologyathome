@@ -270,7 +270,8 @@
           ! LensPotentialFileName =  Ini_Read_String('lens_potential_output_file')
 
           ! -- Boinc addition
-          ScalarFileName = ReadBoincFilename('scalar_output_file', outroot) 
+          !ScalarFileName = ReadBoincFilename('scalar_output_file', outroot) 
+          call boincrf('scalar_output_file', ScalarFileName, len('scalar_output_file'), Ini_max_string_len)
           LensedFileName = ReadBoincFilename('lensed_output_file', outroot) 
           LensPotentialFileName = ReadBoincFilename('lens_potential_output_file', "") 
           
@@ -313,9 +314,9 @@
        !-- Boinc Addition
        !! Touch each file to make sure they are empty
        !CPsFileName = trim(outroot)//Ini_Read_String('cps_output_file')
-       CPsFileName = ReadBoincFilename('cps_output_file', outroot)
-       open(unit=1,file=CpsFileName)
-       close(1)
+       !CPsFileName = ReadBoincFilename('cps_output_file', outroot)
+       !open(unit=1,file=CpsFileName)
+       !close(1)
        if (P%WantScalars) then
           open(unit=1,file=ScalarFileName)
           close(1)
@@ -449,26 +450,26 @@
           call initlval(lvals_tensor,P%Max_l_tensor)
  
             !! Write string of Cosmo parameters
-          open(unit=1,file=CPsFileName)
-          write(1,'(20E16.7)') P%omegab, &
-                               P%omegac, &
-                               P%omegav, &
-                               P%omegan, &
-                               P%omegak, &
-                               P%H0,     &
-                               theta,    &
-                               P%Reion%optical_depth, &
-                               P%InitPower%an(1),     &
-                               P%InitPower%n_run(1),  &
-                               P%InitPower%ScalarPowerAmp(1), &
-                               P%InitPower%ant(1),            &
-                               P%InitPower%rat(1),            &
-                               w_lam,   &
-                               cs2_lam, &
-                               P%TCMB,  &
-                               P%yhe,   &
-                               P%Num_Nu_massless, &
-                               DBLE(P%Num_Nu_massive)
+          !open(unit=1,file=CPsFileName)
+          !write(1,'(20E16.7)') P%omegab, &
+          !                     P%omegac, &
+          !                     P%omegav, &
+          !                     P%omegan, &
+          !                     P%omegak, &
+          !                     P%H0,     &
+          !                     theta,    &
+          !                     P%Reion%optical_depth, &
+          !                     P%InitPower%an(1),     &
+          !                     P%InitPower%n_run(1),  &
+          !                     P%InitPower%ScalarPowerAmp(1), &
+          !                     P%InitPower%ant(1),            &
+          !                     P%InitPower%rat(1),            &
+          !                     w_lam,   &
+          !                     cs2_lam, &
+          !                     P%TCMB,  &
+          !                     P%yhe,   &
+          !                     P%Num_Nu_massless, &
+          !                     DBLE(P%Num_Nu_massive)
                                
           !write(1,'(20e16.7)') P%omegab, P%omegac, P%omegav, P%omegan, P%omegak,    &
           !                     P%H0, P%Reion%optical_depth, P%InitPower%an(1),      &
@@ -483,6 +484,7 @@
              !! The transfer function and matter power spectrum are written using
              !! the routines in CAMB above.
           if (P%WantScalars) then
+             write (0, *) ScalarFileName
              open(unit=1,file=ScalarFileName)
              if (P%DoLensing) then
                 do i = 1, lvals_scalar%l0
