@@ -214,7 +214,8 @@
 !     lmax is max possible number of l's evaluated
       integer, parameter :: lmax_arr = l0max
 
-      character(LEN=1024) :: highL_unlensed_cl_template = 'HighLExtrapTemplate_lenspotentialCls.dat'
+      character(LEN=1024) :: highL_unlensed_cl_template = &
+      '/home/zonca/p/software/cosmologyathome/repo/camb/HighLExtrapTemplate_lenspotentialCls.dat'
            !fiducial high-accuracy high-L C_L used for making small cosmology-independent numerical corrections
            !to lensing and C_L interpolation. Ideally close to models of interest, but dependence is weak.
       logical :: use_spline_template = .true.
