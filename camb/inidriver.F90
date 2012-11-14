@@ -245,12 +245,12 @@
        
        !-- Boinc Addition
        !! Touch each output file to make sure they are created
-       open(unit=1,file=ScalarFileName);close(1)
-       open(unit=1,file=TensorFileName);close(1)
-       open(unit=1,file=VectorFileName);close(1)
-       open(unit=1,file=LensedFileName);close(1)
-       open(unit=1,file=TransferFilenames(1));close(1)
-       open(unit=1,file=MatterPowerFilenames(1));close(1)
+       !open(unit=1,file=ScalarFileName);close(1)
+       !open(unit=1,file=TensorFileName);close(1)
+       !open(unit=1,file=VectorFileName);close(1)
+       !open(unit=1,file=LensedFileName);close(1)
+       !open(unit=1,file=TransferFilenames(1));close(1)
+       !open(unit=1,file=MatterPowerFilenames(1));close(1)
        !-- End Boinc
 
        Ini_fail_on_not_found = .false. 
