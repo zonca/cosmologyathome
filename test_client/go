@@ -1,0 +1,1 @@
+cp client_state_save.xml client_state.xml ; ./boinc

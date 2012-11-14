@@ -1,0 +1,6 @@
+<cc_config>
+    <options>
+        <skip_cpu_benchmarks/>
+        <unsigned_apps_ok/>
+    </options>
+</cc_config>
