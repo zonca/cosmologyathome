@@ -23,15 +23,6 @@
 
         implicit none
         
-        ! -- Boinc Addition
-        interface
-          function boinc_is_standalone()
-            !DEC$ ATTRIBUTES C :: boinc_is_standalone
-            integer boinc_is_standalone
-          end function boinc_is_standalone
-        end interface
-        ! -- End Boinc
-        
         Type(CAMBparams) P
         
         character(LEN=Ini_max_string_len) numstr, VectorFileName, &
@@ -60,11 +51,12 @@
        ! -- Boinc Addition
        !! This will hold the values that were evolved
        type(lSamples) :: lvals_scalar, lvals_tensor
-       integer :: ll, ltmp
+       integer :: ll, ltmp, is_standalone
        real(dl) :: theta
 
        call boinc_init()
-       if (boinc_is_standalone() /= 0) then
+       call boinc_is_standalone(is_standalone)
+       if (is_standalone /= 0) then
          write(*,*) "Running standalone"
        else
          call boinc_fraction_done(0.0)
@@ -73,7 +65,7 @@
         InputFile = ''
         BoincInputFile = ''
  
-        BoincInputFile = GetParam(1)
+        BoincInputFile = 'in'
         write (*,*) "inputfile: ", BoincInputFile
         if (BoincInputFile == '') stop 'No parameter input file'
 
