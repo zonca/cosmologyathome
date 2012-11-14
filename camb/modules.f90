@@ -214,8 +214,10 @@
 !     lmax is max possible number of l's evaluated
       integer, parameter :: lmax_arr = l0max
 
-      character(LEN=1024) :: highL_unlensed_cl_template = &
-      '/home/zonca/p/software/cosmologyathome/repo/camb/HighLExtrapTemplate_lenspotentialCls.dat'
+      !---- Boinc Addition
+      character(LEN=1024) :: BoincDatFile, highL_unlensed_cl_template
+      !---- End Boinc
+
            !fiducial high-accuracy high-L C_L used for making small cosmology-independent numerical corrections
            !to lensing and C_L interpolation. Ideally close to models of interest, but dependence is weak.
       logical :: use_spline_template = .true.
@@ -906,6 +908,12 @@
 
          if (.not. allocated(highL_CL_template)) then
              allocate(highL_CL_template(lmin:lmax_extrap_highl, C_Temp:C_Phi))
+
+            !---- Boinc Addition
+            BoincDatFile = 'dat'
+            call boincrf(BoincDatFile, highL_unlensed_cl_template, len(BoincDatFile), 1024)
+            !---- End Boinc
+
              call OpenTxtFile(highL_unlensed_cl_template,fileio_unit)
              if (lmin==1) highL_CL_template(lmin,:)=0
              do
