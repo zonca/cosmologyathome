@@ -6,6 +6,28 @@ FISHER=
 #Edit for your compiler
 #Note there are many old ifc versions, some of which behave oddly
 
+#Gfortran compiler:
+#The options here work in v4.5, delete from RHS in earlier versions (15% slower)
+#if pre v4.3 add -D__GFORTRAN__
+#With v4.6+ try -Ofast -march=native -fopenmp
+#On my machine v4.5 is about 20% slower than ifort
+F90C     = gfortran
+FFLAGS =  -O3 -ffast-math -march=native -funroll-loops
+
+UNAME = $(shell UNAME)
+ifeq (,$(findstring MINGW,$UNAME))
+    $(warning Detected MINGW Platform)
+    FFLAGS += -static 
+    CLIBS   = -lstdc++ -lpsapi 
+else ifeq $UNAME "Linux"
+    $(warning Detected Linux Platform)
+    FFLAGS += -fopenmp
+    CLIBS   = -lstdc++ -lpthread -lgcc -lm -lc -ldl -lnsl    
+else
+    $(warning Could not detect Platform)
+endif
+
+
 
 #Intel , -openmp toggles mutli-processor:
 #note version 10.0 gives wrong result for lensed when compiled with -openmp [fixed in 10.1]
@@ -14,15 +36,6 @@ FISHER=
 #ifneq ($(FISHER),)
 #FFLAGS += -mkl
 #endif
-
-#Gfortran compiler:
-#The options here work in v4.5, delete from RHS in earlier versions (15% slower)
-#if pre v4.3 add -D__GFORTRAN__
-#With v4.6+ try -Ofast -march=native -fopenmp
-#On my machine v4.5 is about 20% slower than ifort
-F90C     = gfortran
-FFLAGS =  -O3 -fopenmp -ffast-math -march=native -funroll-loops
-
 
 #Old Intel ifc, add -openmp for multi-processor (some have bugs):
 #F90C     = ifc

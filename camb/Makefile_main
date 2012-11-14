@@ -15,9 +15,8 @@ DRIVER        = inidriver.F90
 #DRIVER        = tester.f90
 
 # Compiled Boinc objects
-BOINCAPI = boinc/api/*.o
+BOINCAPI = boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o
 BOINCLIB = -Lboinc/lib -lboinc
-CLIBS         = -lstdc++ -lpthread -lgcc -lm -lc -ldl -lnsl
 # End Boinc
 
 CAMBLIB       = libcamb.a
