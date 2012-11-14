@@ -26,6 +26,10 @@
     <status>1</status>
 </file_info>
 <file_info>
+    <name>HighLExtrapTemplate_lenspotentialCls.dat</name>
+    <status>1</status>
+</file_info>
+<file_info>
     <name>scalar.txt</name>
     <generated_locally/>
     <max_nbytes>1e6</max_nbytes>
@@ -46,6 +50,10 @@
     <file_ref>
         <file_name>input.txt</file_name>
         <open_name>in</open_name>
+    </file_ref>
+    <file_ref>
+        <file_name>HighLExtrapTemplate_lenspotentialCls.dat</file_name>
+        <open_name>dat</open_name>
     </file_ref>
 </workunit>
 
