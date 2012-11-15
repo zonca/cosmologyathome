@@ -45,15 +45,14 @@
         InputFile = GetParam(1)
         if (InputFile == '') stop 'No parameter input file'
 
-       !-- Boinc Addition
-       call boinc_init()
-       if (boinc_is_standalone() /= 0) then
-         write(*,*) "Running standalone"
-       else
-         call boinc_fraction_done(0.0)
-       end if
-       !-- End Boinc
-
+        !-- Boinc Addition
+        call boinc_init()
+        if (boinc_is_standalone() /= 0) then
+        write(*,*) "Running standalone"
+        else
+        call boinc_fraction_done(0.0)
+        end if
+        !-- End Boinc
 
         call Ini_Open(InputFile, 1, bad, .false.)
         if (bad) stop 'Error opening parameter file'
@@ -112,8 +111,6 @@
                 
 !  Read initial parameters.
        
-       !w_lam = Ini_Read_Double('w', -1.d0)   
-       ! oct12 version
        call DarkEnergy_ReadParams(DefIni)
 
        P%h0     = Ini_Read_Double('hubble')
@@ -159,46 +156,47 @@
         read(numstr,*) P%Nu_mass_fractions(1:P%Nu_mass_eigenstates)
        end if
 
+
+
+    !---------------------------------
+    ! This section modified to always output transfer/mpk at z=0 when get_transfer=True
+    ! even if non-linear lensing is turned on.
+    !
+       if (P%WantTransfer)  then
+        P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
+        P%transfer%kmax          =  Ini_Read_Double('transfer_kmax')
+        P%transfer%k_per_logint  =  Ini_Read_Int('transfer_k_per_logint')
+        P%transfer%num_redshifts =  1
+        
+        transfer_interp_matterpower = Ini_Read_Logical('transfer_interp_matterpower ', transfer_interp_matterpower)
+        transfer_power_var = Ini_read_int('transfer_power_var',transfer_power_var)
+        if (P%transfer%num_redshifts > max_transfer_redshifts) stop 'Too many redshifts'
+        P%transfer%redshifts(1)  = 0
+        P%transfer%kmax=P%transfer%kmax*(P%h0/100._dl)
+       else
+         P%transfer%high_precision = .false.
+       endif
+
        if (P%NonLinear==NonLinear_lens .and. P%DoLensing) then
           if (P%WantTransfer) &
              write (*,*) 'overriding transfer settings to get non-linear lensing'
           P%WantTransfer  = .true.
           call Transfer_SetForNonlinearLensing(P%Transfer)
           P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
-       
-       else if (P%WantTransfer)  then
-        P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
-        P%transfer%kmax          =  Ini_Read_Double('transfer_kmax')
-        P%transfer%k_per_logint  =  Ini_Read_Int('transfer_k_per_logint')
-        P%transfer%num_redshifts =  Ini_Read_Int('transfer_num_redshifts')
-        
-        transfer_interp_matterpower = Ini_Read_Logical('transfer_interp_matterpower ', transfer_interp_matterpower)
-        transfer_power_var = Ini_read_int('transfer_power_var',transfer_power_var)
-        if (P%transfer%num_redshifts > max_transfer_redshifts) stop 'Too many redshifts'
-        do i=1, P%transfer%num_redshifts
-             P%transfer%redshifts(i)  = Ini_Read_Double_Array('transfer_redshift',i,0._dl)
-             transferFileNames(i)     = Ini_Read_String_Array('transfer_filename',i)
-             MatterPowerFilenames(i)  = Ini_Read_String_Array('transfer_matterpower',i)
-             
-             if (TransferFileNames(i) == '') then
-                 TransferFileNames(i) =  trim(numcat('transfer_',i))//'.dat'
-             end if
-             if (MatterPowerFilenames(i) == '') then
-                 MatterPowerFilenames(i) =  trim(numcat('matterpower_',i))//'.dat'
-             end if
-             if (TransferFileNames(i)/= '') &
-                   TransferFileNames(i) = trim(outroot)//TransferFileNames(i)
-             if (MatterPowerFilenames(i) /= '') &
-                 MatterPowerFilenames(i)=trim(outroot)//MatterPowerFilenames(i)
-        end do
+          do i=1, P%transfer%num_redshifts
+             transferFileNames(i)     = ''
+             MatterPowerFilenames(i)  = ''
+          end do
+       end if
+      transferFileNames(p%transfer%num_redshifts) = 'transfer.txt'
+      MatterPowerFilenames(p%transfer%num_redshifts) = 'mpk.txt'
+    !
+    !---------------------------------
 
 
-        P%transfer%kmax=P%transfer%kmax*(P%h0/100._dl)
-                
-       else
-         P%transfer%high_precision = .false.
-       endif
-  
+
+
+
         Ini_fail_on_not_found = .false. 
   
         call Reionization_ReadParams(P%Reion, DefIni)
@@ -218,22 +216,19 @@
               numstr = Ini_Read_String('initial_vector',.true.)
               read (numstr,*) P%InitialConditionVector(1:initial_iso_neutrino_vel)
             end if
-            ! oct12
             if (P%Scalar_initial_condition/= initial_adiabatic) use_spline_template = .false.
         end if
         
        if (P%WantScalars) then
-          ScalarFileName = trim(outroot)//Ini_Read_String('scalar_output_file')
-          LensedFileName =  trim(outroot) //Ini_Read_String('lensed_output_file')
-          LensPotentialFileName =  Ini_Read_String('lens_potential_output_file')
-          if (LensPotentialFileName/='') LensPotentialFileName = concat(outroot,LensPotentialFileName)
+          ScalarFileName = 'scalar_cls.txt'
+          LensedFileName =  'lensed_cls.txt'
+          LensPotentialFileName = ''
         end if
         if (P%WantTensors) then
-          TensorFileName =  trim(outroot) //Ini_Read_String('tensor_output_file')
+          TensorFileName = 'tensor_cls.txt'
          if (P%WantScalars)  then
-          TotalFileName =  trim(outroot) //Ini_Read_String('total_output_file')
-          LensedTotFileName = Ini_Read_String('lensed_total_output_file')
-          if (LensedTotFileName/='') LensedTotFileName= trim(outroot) //trim(LensedTotFileName)
+          TotalFileName =  ''
+          LensedTotFileName = ''
          end if
         end if
         if (P%WantVectors) then
@@ -270,7 +265,6 @@
        P%AccuratePolarization = Ini_Read_Logical('accurate_polarization',.true.)
        P%AccurateReionization = Ini_Read_Logical('accurate_reionization',.false.)
        P%AccurateBB = Ini_Read_Logical('accurate_BB',.false.)
-       ! oct12
        P%DerivedParameters = Ini_Read_Logical('derived_parameters',.true.)
 
        version_check = Ini_Read_String('version_check')
@@ -306,13 +300,6 @@
        else
         lSampleBoost   = Ini_Read_Double('l_sample_boost',lSampleBoost)
        end if
-       if (outroot /= '') then
-         if (InputFile /= trim(outroot) //'params.ini') then   
-          call Ini_SaveReadValues(trim(outroot) //'params.ini',1)
-         else
-          write(*,*) 'Output _params.ini not created as would overwrite input'    
-         end if
-       end if
 
        call Ini_Close
 
@@ -333,7 +320,7 @@
         stop
        endif
     
-        if (P%WantTransfer .and. .not. (P%NonLinear==NonLinear_lens .and. P%DoLensing)) then
+        if (P%WantTransfer) then
          call Transfer_SaveToFiles(MT,TransferFileNames)
          call Transfer_SaveMatterPower(MT,MatterPowerFileNames)
          if ((P%OutputNormalization /= outCOBE) .or. .not. P%WantCls)  call Transfer_output_sig8(MT)
