@@ -45,6 +45,16 @@
         InputFile = GetParam(1)
         if (InputFile == '') stop 'No parameter input file'
 
+       !-- Boinc Addition
+       call boinc_init()
+       if (boinc_is_standalone() /= 0) then
+         write(*,*) "Running standalone"
+       else
+         call boinc_fraction_done(0.0)
+       end if
+       !-- End Boinc
+
+
         call Ini_Open(InputFile, 1, bad, .false.)
         if (bad) stop 'Error opening parameter file'
 
