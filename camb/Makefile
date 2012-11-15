@@ -14,12 +14,12 @@ FISHER=
 F90C     = gfortran
 FFLAGS =  -O3 -ffast-math -march=native -funroll-loops
 
-UNAME = $(shell UNAME)
-ifeq (,$(findstring MINGW,$UNAME))
+UNAME = $(shell uname)
+ifneq (,$(findstring MINGW,$(UNAME)))
     $(warning Detected MINGW Platform)
     FFLAGS += -static 
     CLIBS   = -lstdc++ -lpsapi 
-else ifeq $UNAME "Linux"
+else ifeq ($(UNAME),Linux)
     $(warning Detected Linux Platform)
     FFLAGS += -fopenmp
     CLIBS   = -lstdc++ -lpthread -lgcc -lm -lc -ldl -lnsl    
