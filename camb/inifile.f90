@@ -818,26 +818,5 @@ contains
 
   end subroutine Ini_SaveReadValues_File
 
-  ! -- Boinc Addition
-   function ReadBoincFilename(Key, outroot, NotFoundFail) result(AValue)
- 
-     character (LEN=*), intent(IN) :: Key
-     character (LEN=*), intent(IN) :: outroot
-     logical, optional, intent(IN) :: NotFoundFail
-     character(LEN=Ini_max_string_len) :: AValue
- 
-     character(Len=Ini_max_string_len) :: temp
-     integer :: strlen
- 
-     temp = trim(outroot)//Ini_Read_String(Key)
-     strlen = len(temp)
- 
-     call boincrf(temp, AValue, strlen, Ini_max_string_len)
- 
-     !write(*,*) temp, " and ", AValue
- 
-   end function ReadBoincFilename
-   ! -- End Boinc
-
 end module IniFile
 
