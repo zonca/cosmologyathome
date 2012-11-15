@@ -22,7 +22,7 @@
     <status>1</status>
 </file_info>
 <file_info>
-    <name>input.txt</name>
+    <name>params.ini</name>
     <status>1</status>
 </file_info>
 <file_info>
@@ -30,7 +30,7 @@
     <status>1</status>
 </file_info>
 <file_info>
-    <name>scalar.txt</name>
+    <name>scalar_cls.txt</name>
     <generated_locally/>
     <max_nbytes>1e6</max_nbytes>
 </file_info>
@@ -47,13 +47,18 @@
 <workunit>
     <name>test_wu</name>
     <app_name>test_app</app_name>
+    <command_line>
+params.ini
+    </command_line>
     <file_ref>
-        <file_name>input.txt</file_name>
-        <open_name>in</open_name>
+        <file_name>params.ini</file_name>
+        <open_name>params.ini</open_name>
+        <copy_file/>
     </file_ref>
     <file_ref>
         <file_name>HighLExtrapTemplate_lenspotentialCls.dat</file_name>
-        <open_name>dat</open_name>
+        <open_name>HighLExtrapTemplate_lenspotentialCls.dat</open_name>
+        <copy_file/>
     </file_ref>
 </workunit>
 
@@ -63,8 +68,9 @@
     <state>2</state>
     <report_deadline>2e9</report_deadline>
     <file_ref>
-        <file_name>scalar.txt</file_name>
-        <open_name>scalar_output_file</open_name>
+        <file_name>scalar_cls.txt</file_name>
+        <open_name>scalar_cls.txt</open_name>
+        <copy_file/>
     </file_ref>
 </result>
 
