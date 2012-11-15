@@ -1,11 +1,13 @@
 <input_template>
     <file_info>
+        <name>params.ini</name>
         <number>0</number>
     </file_info>
     <workunit>
         <file_ref>
             <file_number>0</file_number>
             <open_name>params.ini</open_name>
+            <copy_file/>
         </file_ref>
     </workunit>
 </input_template>

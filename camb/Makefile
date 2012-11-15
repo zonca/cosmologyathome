@@ -22,7 +22,7 @@ ifneq (,$(findstring MINGW,$(UNAME)))
 else ifeq ($(UNAME),Linux)
     $(warning Detected Linux Platform)
     FFLAGS += -fopenmp
-    CLIBS   = -lstdc++ -lpthread -lgcc -lm -lc -ldl -lnsl    
+    CLIBS   = -lstdc++ -lpthread 
 else
     $(warning Could not detect Platform)
 endif
