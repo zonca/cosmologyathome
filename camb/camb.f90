@@ -430,7 +430,7 @@
                 write(*,*) 'There is nothing to do! Do transfer functions or Cls.'
              end if
 
-             if (P%h0 < 20._dl.or.P%h0 > 100._dl) then
+             if (P%h0 < 20._dl.or.P%h0 > 200._dl) then
                OK = .false.
                write(*,*) '  Warning: H0 has units of km/s/Mpc. You have:', P%h0
             end if
@@ -438,18 +438,18 @@
                 write(*,*) '  Warning: Tcmb has units of K.  Your have:', P%tcmb
              end if
 
-             if (P%yhe < 0.2d0.or.P%yhe > 0.8d0) then
+             if (P%yhe < 0d0.or.P%yhe > 0.8d0) then
                 OK = .false.
                 write(*,*) &
                      '  Warning: YHe is the Helium fraction of baryons.', &
                      '  Your have:', P%yhe
              end if
-             if (P%Num_Nu_massive < 0.or.P%Num_Nu_massive > 3.1) then
+             if (P%Num_Nu_massive < 0.or.P%Num_Nu_massive > 10) then
                 OK = .false.
                 write(*,*) &
                      'Warning: Num_Nu_massive is strange:',P%Num_Nu_massive 
               end if
-             if (P%Num_Nu_massless < 0.or.P%Num_Nu_massless > 3.1) then
+             if (P%Num_Nu_massless < 0.or.P%Num_Nu_massless > 10) then
                 OK = .false.
                 write(*,*) &
                      'Warning: Num_nu_massless is strange:', P%Num_Nu_massless
