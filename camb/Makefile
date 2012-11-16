@@ -21,7 +21,6 @@ ifneq (,$(findstring MINGW,$(UNAME)))
     CLIBS  += -lpsapi 
 else ifeq ($(UNAME),Linux)
     $(warning Detected Linux Platform)
-    FFLAGS += -fopenmp
     CLIBS  += -Wl,--whole-archive -lpthread -Wl,--no-whole-archive  
 else
     $(warning Could not detect Platform)
