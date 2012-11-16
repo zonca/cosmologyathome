@@ -11,18 +11,18 @@ FISHER=
 #if pre v4.3 add -D__GFORTRAN__
 #With v4.6+ try -Ofast -march=native -fopenmp
 #On my machine v4.5 is about 20% slower than ifort
-F90C     = gfortran
-FFLAGS =  -O3 -ffast-math -march=native -funroll-loops
+F90C    = gfortran
+FFLAGS  =  -O3 -ffast-math -march=native -funroll-loops -static
+CLIBS   = -lstdc++
 
 UNAME = $(shell uname)
 ifneq (,$(findstring MINGW,$(UNAME)))
     $(warning Detected MINGW Platform)
-    FFLAGS += -static 
-    CLIBS   = -lstdc++ -lpsapi 
+    CLIBS  += -lpsapi 
 else ifeq ($(UNAME),Linux)
     $(warning Detected Linux Platform)
     FFLAGS += -fopenmp
-    CLIBS   = -lstdc++ -lpthread 
+    CLIBS  += -Wl,--whole-archive -lpthread -Wl,--no-whole-archive  
 else
     $(warning Could not detect Platform)
 endif
