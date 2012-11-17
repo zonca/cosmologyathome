@@ -22,8 +22,8 @@ ifneq (,$(findstring MINGW,$(UNAME)))
 else ifeq ($(UNAME),Linux)
     $(warning Detected Linux platform)
     FFLAGS += -static
-    BOINCAPI = -lstdc++ -Wl,--whole-archive -lpthread -Wl,--no-whole-archive boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -Lboinc/lib -lboinc
-else ifeq ($(UNAME),Darwin)
+    BOINCAPI = boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -Lboinc/lib -lboinc -lstdc++ -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
+else ifeq ($(UNAME),Darwin) 
     $(warning Detected OSX platform)
     BOINCAPI = boinc/api/boinc_api_fortran.o boinc/mac_build/build/Development/libboinc.a boinc/mac_build/build/Development/libboinc_api.a -lstdc++	-static-libgcc -static-libgfortran -static-libstdc++
     BOINCDEPS = boinc/api/boinc_api_fortran.o
