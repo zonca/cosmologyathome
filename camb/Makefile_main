@@ -14,11 +14,6 @@ DRIVER        = inidriver.F90
 #DRIVER        = sigma8.f90
 #DRIVER        = tester.f90
 
-# Compiled Boinc objects
-BOINCAPI = boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o
-BOINCLIB = -Lboinc/lib -lboinc
-# End Boinc
-
 CAMBLIB       = libcamb.a
 
 #Shouldn't need to change anything else...
@@ -47,8 +42,8 @@ $(BISPECTRUM).o: lensing.o modules.o
 cmbmain.o: lensing.o $(NONLINEAR).o $(EQUATIONS).o $(BISPECTRUM).o
 camb.o: cmbmain.o
 Matrix_utils.o: utils.o
-camb: $(CAMBOBJ) $(DRIVER)
-	$(F90C) $(F90FLAGS) $(CAMBOBJ) $(DRIVER) $(BOINCAPI) $(BOINCLIB) $(CLIBS) -o $@
+camb: $(CAMBOBJ) $(DRIVER) $(BOINCDEPS)
+	$(F90C) $(F90FLAGS) $(CAMBOBJ) $(DRIVER) $(BOINCAPI) -o $@
 
 $(CAMBLIB): $(CAMBOBJ)
 	ar -r $@ $?

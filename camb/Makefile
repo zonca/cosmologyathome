@@ -12,20 +12,27 @@ FISHER=
 #With v4.6+ try -Ofast -march=native -fopenmp
 #On my machine v4.5 is about 20% slower than ifort
 F90C    = gfortran
-FFLAGS  =  -O3 -ffast-math -march=native -funroll-loops -static
-CLIBS   = -lstdc++
+FFLAGS  =  -O3 -ffast-math -march=native -funroll-loops
 
 UNAME = $(shell uname)
 ifneq (,$(findstring MINGW,$(UNAME)))
-    $(warning Detected MINGW Platform)
-    CLIBS  += -lpsapi 
+    $(warning Detected MINGW platform)
+    FFLAGS += -static
+    BOINCAPI = -Lboinc/lib -lboinc boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -lstdc++ -lpsapi
 else ifeq ($(UNAME),Linux)
-    $(warning Detected Linux Platform)
-    CLIBS  += -Wl,--whole-archive -lpthread -Wl,--no-whole-archive  
+    $(warning Detected Linux platform)
+    FFLAGS += -static
+    BOINCAPI = -lstdc++ -Wl,--whole-archive -lpthread -Wl,--no-whole-archive boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -Lboinc/lib -lboinc
+else ifeq ($(UNAME),Darwin)
+    $(warning Detected OSX platform)
+    BOINCAPI = boinc/api/boinc_api_fortran.o boinc/mac_build/build/Development/libboinc.a boinc/mac_build/build/Development/libboinc_api.a -lstdc++	-static-libgcc -static-libgfortran -static-libstdc++
+    BOINCDEPS = boinc/api/boinc_api_fortran.o
+default: camb
+boinc/api/boinc_api_fortran.o: boinc/api/boinc_api_fortran.cpp
+	gcc -c $? -o $@ -I boinc/lib -DOSX
 else
     $(warning Could not detect Platform)
 endif
-
 
 
 #Intel , -openmp toggles mutli-processor:
