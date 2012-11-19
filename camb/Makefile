@@ -18,7 +18,7 @@ UNAME = $(shell uname)
 ifneq (,$(findstring MINGW,$(UNAME)))
     $(warning Detected MINGW platform)
     FFLAGS += -static
-    BOINCAPI = -Lboinc/lib -lboinc boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -lstdc++ -lpsapi
+    BOINCAPI = boinc/api/boinc_api_fortran.o boinc/api/boinc_api.o -Lboinc/lib -lboinc -lstdc++ -lpsapi 
 else ifeq ($(UNAME),Linux)
     $(warning Detected Linux platform)
     FFLAGS += -static
