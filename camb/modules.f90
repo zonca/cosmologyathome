@@ -2001,7 +2001,7 @@
 
           do i=1, CP%Transfer%num_redshifts
             if (FileNames(i) /= '') then
-            open(unit=fileio_unit,file=FileNames(i),form='formatted',status='replace')
+            open(unit=fileio_unit,file=FileNames(i),form='formatted',access='append')
              do ik=1,MTrans%num_q_trans
                 if (MTrans%TransferData(Transfer_kh,ik,i)/=0) then
                  write(fileio_unit,'(7E14.6)') MTrans%TransferData(Transfer_kh:Transfer_max,ik,i)
@@ -2048,7 +2048,7 @@
                    call MatterPowerdata_Free(PK_Data)
                  end do
 
-                 open(unit=fileio_unit,file=FileNames(itf),form='formatted',status='replace')
+                 open(unit=fileio_unit,file=FileNames(itf),form='formatted',access='append')
                  do i=1,points
                   write (fileio_unit, fmt) MTrans%TransferData(Transfer_kh,i,1),outpower(i,1:CP%InitPower%nn)
                  end do
@@ -2073,7 +2073,7 @@
              end if
              end do
 
-             open(unit=fileio_unit,file=FileNames(itf),form='formatted',status='replace')
+             open(unit=fileio_unit,file=FileNames(itf),form='formatted',access='append')
              do i=1,points
               write (fileio_unit, fmt) minkh*exp((i-1)*dlnkh),outpower(i,1:CP%InitPower%nn)
              end do

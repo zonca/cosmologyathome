@@ -30,7 +30,7 @@
         
         character(LEN=Ini_max_string_len) numstr, VectorFileName, &
             InputFile, ScalarFileName, TensorFileName, TotalFileName, LensedFileName,&
-            LensedTotFileName, LensPotentialFileName
+            LensedTotFileName, LensPotentialFileName, buf
         integer i
         character(LEN=Ini_max_string_len) TransferFileNames(max_transfer_redshifts), &
                MatterPowerFileNames(max_transfer_redshifts), outroot, version_check
@@ -159,37 +159,34 @@
 
 
     !---------------------------------
-    ! This section modified to always output transfer/mpk at z=0 when get_transfer=True
-    ! even if non-linear lensing is turned on.
+    ! This section modified to manually specify mpk/transfer redshifts and output them
+    ! into one file even if non-linear lensing is on.
     !
+       P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
+
        if (P%WantTransfer)  then
-        P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
         P%transfer%kmax          =  Ini_Read_Double('transfer_kmax')
         P%transfer%k_per_logint  =  Ini_Read_Int('transfer_k_per_logint')
-        P%transfer%num_redshifts =  1
-        
+        P%transfer%num_redshifts =  Ini_Read_Int('transfer_num_redshifts')
+        buf = Ini_Read_String("transfer_redshifts")
+        read (buf,*) P%transfer%redshifts(1:P%transfer%num_redshifts)
+
         transfer_interp_matterpower = Ini_Read_Logical('transfer_interp_matterpower ', transfer_interp_matterpower)
         transfer_power_var = Ini_read_int('transfer_power_var',transfer_power_var)
         if (P%transfer%num_redshifts > max_transfer_redshifts) stop 'Too many redshifts'
-        P%transfer%redshifts(1)  = 0
         P%transfer%kmax=P%transfer%kmax*(P%h0/100._dl)
-       else
-         P%transfer%high_precision = .false.
-       endif
 
-       if (P%NonLinear==NonLinear_lens .and. P%DoLensing) then
-          if (P%WantTransfer) &
-             write (*,*) 'overriding transfer settings to get non-linear lensing'
+        do i=1, P%transfer%num_redshifts
+           transferFileNames(i)     = 'transfer.txt'
+           MatterPowerFilenames(i)  = 'mpk.txt'
+        end do
+
+        open(unit=fileio_unit,file='mpk.txt',status='replace'); close(unit=fileio_unit)
+        open(unit=fileio_unit,file='transfer.txt',status='replace'); close(unit=fileio_unit)
+       else if (P%NonLinear==NonLinear_lens .and. P%DoLensing) then
           P%WantTransfer  = .true.
           call Transfer_SetForNonlinearLensing(P%Transfer)
-          P%Transfer%high_precision=  Ini_Read_Logical('transfer_high_precision',.false.)
-          do i=1, P%transfer%num_redshifts
-             transferFileNames(i)     = ''
-             MatterPowerFilenames(i)  = ''
-          end do
        end if
-      transferFileNames(p%transfer%num_redshifts) = 'transfer.txt'
-      MatterPowerFilenames(p%transfer%num_redshifts) = 'mpk.txt'
     !
     !---------------------------------
 
