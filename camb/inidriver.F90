@@ -180,9 +180,6 @@
            transferFileNames(i)     = 'transfer.txt'
            MatterPowerFilenames(i)  = 'mpk.txt'
         end do
-
-        open(unit=fileio_unit,file='mpk.txt',status='replace'); close(unit=fileio_unit)
-        open(unit=fileio_unit,file='transfer.txt',status='replace'); close(unit=fileio_unit)
        else if (P%NonLinear==NonLinear_lens .and. P%DoLensing) then
           P%WantTransfer  = .true.
           call Transfer_SetForNonlinearLensing(P%Transfer)
@@ -245,15 +242,6 @@
         end if
 #endif        
        
-       !-- Boinc Addition
-       !! Touch each output file to make sure they are created
-       !open(unit=1,file=ScalarFileName);close(1)
-       !open(unit=1,file=TensorFileName);close(1)
-       !open(unit=1,file=VectorFileName);close(1)
-       !open(unit=1,file=LensedFileName);close(1)
-       !open(unit=1,file=TransferFilenames(1));close(1)
-       !open(unit=1,file=MatterPowerFilenames(1));close(1)
-       !-- End Boinc
 
        Ini_fail_on_not_found = .false. 
 
@@ -310,6 +298,14 @@
          Age = CAMB_GetAge(P) 
          write (*,'("Age of universe/GYr  = ",f7.3)') Age  
        end if 
+
+       !! Touch each output file to make sure they are created
+       open(unit=1,file='scalar_cls.txt');close(1)
+       open(unit=1,file='tensor_cls.txt');close(1)
+       open(unit=1,file='lensed_cls.txt');close(1)
+       open(unit=1,file='transfer.txt');close(1)
+       open(unit=1,file='mpk.txt');close(1)
+
 
        if (global_error_flag==0) call CAMB_GetResults(P)
        if (global_error_flag/=0) then
