@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+"""
+This script submits one or many workunits for the CAMB app.
+
+The input is a parameter file or a folder full of them. This script copies the parameter
+file into the correct place as given by bin/dir_hier_path, then calls bin/create_work 
+with the appropriate options to submit the work unit. 
+"""
+
+import sys, argparse
+import os, os.path as osp
+from subprocess import check_output, STDOUT
+from shutil import copyfile
+
+parser = argparse.ArgumentParser(prog='camb_create_work')
+parser.add_argument('input',nargs=1,help='a parameter file or folder full of them')
+parser.add_argument('--duplicate',nargs='?',default='0',help='integer to append to the wu_name')
+parser.add_argument('--dry-run',action='store_true',help="don't actually run the command")
+
+if not sys.argv[1:]: parser.print_help()
+else:
+    args = vars(parser.parse_args())
+
+    def create_one(inifile):
+        basename = osp.basename(inifile)
+        wu_name = 'camb_'+basename.replace('params_','').replace('.ini','')+'_%.3i'%int(args['duplicate'])
+        
+        target = osp.dirname(check_output(['bin/dir_hier_path',basename]))
+        try: os.makedirs(target)
+        except: pass
+        
+        if not osp.exists(osp.join(target,basename)): 
+            copyfile(inifile,osp.join(target,basename))
+        
+        cmd = ['bin/create_work',
+			   '--appname','camb',
+		       '--command_line','params.ini',
+               '--wu_name',wu_name,
+               '--min_quorum','1',
+               '--target_nresults','1',
+			    basename]
+
+        print ' '.join(cmd)
+
+        if args['dry_run']:
+            print 'job not submitted because this a dry-run'
+        else:
+            try: print check_output(cmd,stderr=STDOUT)
+            except Exception as e: print e.output
+
+
+    input = args['input'][0]
+    
+    if osp.isdir(input):
+        for f in os.listdir(input): 
+            try:            
+                 create_one(osp.join(input,f))
+            except Exception as e:
+                 print "Error submitting "+osp.join(input,f)
+    else:
+        create_one(input)
